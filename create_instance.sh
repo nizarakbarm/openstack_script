@@ -1,10 +1,10 @@
 #!/bin/bash
 usage() {
-   echo "usage: $0 -i node1 node2 node3"
+   echo "usage: $0 -i node1,node2,noden"
 }
 readPod() {
    local arg=$1
-   instances=($1 $2 $3)
+   instances=($(echo $arg | tr ',' '\n'))
 }
 isPortIPFloat() {
    openstack floating ip list --port $1 | grep "10.1" | cut -d'|' -f3
@@ -30,13 +30,13 @@ done
 
 ## Main ##
 #input options
-if [ -z "#$@" ]; then
+if [ -z "$#" ]; then
    usage
    exit
 fi
 while (( $# )); do
    case $1 in 
-      -i | --instance) readPod $2 $3 $4
+      -i | --instance) readPod $2
                        shift 2
 		       ;;
       -h | --help)     usage
