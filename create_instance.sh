@@ -1,19 +1,24 @@
 #!/bin/bash
+#help message
 usage() {
    echo "usage: $0 -ins|--instance node1,node2,noden -img|--image imagetype -flv|--flavor flavortype"
 }
+#read pod name
 readPod() {
    local arg=$1
    instances=($(echo $arg | tr ',' '\n'))
 }
+#check if pod have a floating ip
 isPortIPFloat() {
    openstack floating ip list --port $1 | grep "10.1" | cut -d'|' -f3
 }
+#mapping ip floating to pod
 mapFloating() {
    if [ -z $(isPortIPFloat $1) ]; then
    	openstack floating ip set --port=$1 $2
    fi
 }
+#create instance
 #instances=(pod43-node1 pod43-node2 pod43-node3)
 createInstance() {
 local IFS=$'\n'
@@ -34,6 +39,7 @@ if [ "$#" == "0" ]; then
    usage
    exit
 fi
+#read argument
 while (( $# )); do
    case $1 in 
       -ins | --instance) readPod $2
