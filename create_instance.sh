@@ -60,5 +60,5 @@ while (( $# )); do
     esac
 done
 
-
+#create instance
 createInstance
