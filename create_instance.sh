@@ -54,7 +54,7 @@ if [ "$ipname" == "" ]; then
 	local ports=($(openstack port list | grep DOWN | sort -k3 | cut -f2 -d'|' | tr -d [[:blank:]]))
 	mapFloating "${ports[$i]}" "${floats[$i]}"
 else
-	mapFloating  "$name" "${floats[$i]}"
+	mapFloating  "$ipname" "${floats[$i]}"
 fi
 
 mapFloating "${ports[$i]}" "${floats[$i]}"
