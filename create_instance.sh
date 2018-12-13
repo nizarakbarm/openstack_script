@@ -1,6 +1,6 @@
 #!/bin/bash
 usage() {
-   echo "usage: $0 -i node1,node2,noden"
+   echo "usage: $0 -ins|--instance node1,node2,noden -img|--image imagetype -flv|--flavor flavortype"
 }
 readPod() {
    local arg=$1
