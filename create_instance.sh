@@ -13,9 +13,10 @@ readPod() {
    local arg=$1
    instances=($(echo $arg | tr ',' '\n'))
 }
-#check if pod have a floating ip
+#check if port have a floating ip
 isPortIPFloat() {
-   openstack floating ip list --port $1 | grep "10.1" | cut -d'|' -f3
+   local portid="$1"
+   openstack floating ip list --port "$portid" | grep "10.1" | cut -d'|' -f3
 }
 
 #create fixed ip address
@@ -34,7 +35,8 @@ createFloating() {
 
 #mapping ip floating to pod
 mapFloating() {
-   if [ -z $(isPortIPFloat $1) ]; then
+   local ports="$1"
+   if [ -z "$(isPortIPFloat "$ports")" ]; then
    	openstack floating ip set --port=$1 $2
    fi
 }
@@ -47,13 +49,13 @@ local IFS=$'\n'
 local floats=($(openstack floating ip list | grep "None" | sort -k2 | cut -d'|' -f3 | tr -d [[:blank:]]))
 local i
 for ((i=0; i<${#instances[@]}; i++)); do
-#openstack floating ip set --port="${ports[$i]}" "${floats[$i]}"  
+#openstack floating ip set --port="${ports[$i]}" "${floats[$i]}"
 if [ "$ipname" == "" ]; then
 	local ports=($(openstack port list | grep DOWN | sort -k3 | cut -f2 -d'|' | tr -d [[:blank:]]))
 	mapFloating "${ports[$i]}" "${floats[$i]}"
 	nova boot --nic port-id="${ports[$i]}" --key-name nizar --image "$image" --flavor "$flavor" "${instances[$i]}"
 else
-	mapFloating  "$ipname" "${floats[$i]}"
+	mapFloating "$portfixip" "${floats[$i]}"
 	nova boot --nic port-id="$portfixip" --key-name nizar --image "$image" --flavor "$flavor" "${instances[$i]}"
 fi
 
