@@ -25,8 +25,7 @@ createFixedIp() {
 	network=$(cut -d"=" -f2 <<< "${netarg[0]}")
 	fixip=$(cut -d"=" -f2 <<< "${netarg[1]}")
 	ipname=$(cut -d"=" -f2 <<< "${netarg[2]}")
-
-	openstack port create --network "$network" --fixed-ip ip-address="$fixip" "$ipname"
+	portfixip=$(openstack port create --network "$network" --fixed-ip ip-address="$fixip" "$ipname" | grep "| id " | cut -d"|" -f3 | tr -d [[:blank:]])
 }
 
 createFloating() {
@@ -48,13 +47,14 @@ local IFS=$'\n'
 local floats=($(openstack floating ip list | grep "None" | sort -k2 | cut -d'|' -f3 | tr -d [[:blank:]]))
 local i
 for ((i=0; i<${#instances[@]}; i++)); do
-nova boot --nic port-id="${ports[$i]}" --key-name nizar --image "$image" --flavor "$flavor" "${instances[$i]}"
 #openstack floating ip set --port="${ports[$i]}" "${floats[$i]}"  
 if [ "$ipname" == "" ]; then
 	local ports=($(openstack port list | grep DOWN | sort -k3 | cut -f2 -d'|' | tr -d [[:blank:]]))
 	mapFloating "${ports[$i]}" "${floats[$i]}"
+	nova boot --nic port-id="${ports[$i]}" --key-name nizar --image "$image" --flavor "$flavor" "${instances[$i]}"
 else
 	mapFloating  "$ipname" "${floats[$i]}"
+	nova boot --nic port-id="$portfixip" --key-name nizar --image "$image" --flavor "$flavor" "${instances[$i]}"
 fi
 
 mapFloating "${ports[$i]}" "${floats[$i]}"
@@ -87,7 +87,7 @@ while (( $# )); do
 	            shift 2
 		    ;;
       -h | --help)     usage
-		       shift
+		       shift 2
                        exit
 		       ;;
       * )              break
