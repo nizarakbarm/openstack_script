@@ -1,11 +1,13 @@
 #!/bin/bash
 #help message
 usage() {
-   echo -e "usage: $0 \n \
-   options: \n \
-   -ins|--instance node1,node2,nodeN -img|--image imagetype -flv|--flavor flavortype \n \
-   [-ip|--fixed-ip network=networkname,ip=ipaddress,name=fixedipname] \n \
-   [--create-floating]"
+   echo -e "usage: $0 \n"\
+   "options: \n "\
+   "-ins|--instance node1,node2,nodeN : specify the name of instance \n "\
+   "-img|--image imagetype : specify image type to be used in instance \n "\
+   "-flv|--flavor flavortype : specify flavor or specification type to be used in instance \n "\
+   "[-ip|--fixed-ip network=networkname,ip=ipaddress,name=fixedipname] : specify fixed ip address to be used by instance\n "\
+   "[--create-floating] : create a floating ip"
 }
 
 #read pod name
